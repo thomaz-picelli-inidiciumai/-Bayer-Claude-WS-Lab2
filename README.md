@@ -17,6 +17,11 @@ Login, barra superior, home, contas (50 médicos de Cardiologia) com ficha.
 ## O que será construído nos labs
 Registrar visita, painel de médicos a visitar e agenda. Specs em `docs/specs/`.
 
+## Ferramentas para trabalhar com o Claude Code
+- **MCP `bayviva`:** consulta somente leitura ao banco (`.mcp.json`). Dentro do Claude Code, `/mcp` mostra se está conectado.
+- **Skills:** `/checar-spec`, `/spec-para-testes` e `/verificar-gravacao`.
+- O fluxo recomendado está no `CLAUDE.md`.
+
 ## Testes
 `pytest`
 
