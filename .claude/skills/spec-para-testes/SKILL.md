@@ -18,8 +18,9 @@ O caminho da spec. Se não foi dado, liste `docs/specs/` e pergunte.
    - estrutura: *dado* (preparar dados), *quando* (chamar a rota com `client`), *então* (asserções sobre status, texto da resposta **e** estado do banco);
    - para checar o banco, use `from app.db import conexao` com `conexao(somente_leitura=True)`; a fixture `client` já aponta o app para um banco temporário;
    - não use mocks do banco: o banco temporário é real e rápido;
+   - em `parametrize`, não use textos longos como valor (o nome do teste fica ilegível); use `ids=[...]` curtos ou parametrize só o tamanho;
    - para datas, use valores relativos ao presente (`datetime.now()` menos ou mais dias) ou datas fixas bem afastadas, nunca uma data que vire passado amanhã.
-4. Critérios que não dá para provar por HTTP (por exemplo "o botão fica desabilitado enquanto salva") **não viram teste falso**. Liste-os na saída como "verificar manualmente" e, se quiser deixar registro, crie o teste com `@pytest.mark.skip(reason="verificação manual: ...")`.
+4. Critérios que não dá para provar por HTTP (por exemplo "o botão fica desabilitado enquanto salva") **não viram teste falso**. Liste-os na saída como "verificar manualmente" e registre-os num comentário na docstring do arquivo de testes. **Não use `@pytest.mark.skip`, `xfail` nem testes vazios:** o hook de qualidade do projeto bloqueia testes desabilitados.
 5. Inclua os casos que a spec define como regra, mesmo sem número de critério: campos obrigatórios, limites de tamanho, mensagens de erro exatas, e o que **não** deve acontecer (nada gravado quando há erro).
 6. Rode `pytest tests/test_<tela>.py` e confirme que:
    - os testes **falham pelo motivo certo** (rota inexistente, funcionalidade ausente), e não por erro de importação ou de sintaxe do próprio teste;

@@ -13,7 +13,7 @@ Permitir que o representante registre uma visita realizada a um médico, para qu
 | Campo | Tipo | Obrigatório | Regra | Placeholder / mensagem de erro |
 | --- | --- | --- | --- | --- |
 | Médico | lista suspensa (nome, ordem alfabética) | sim | deve existir em `medicos` | "Selecione um médico" / "Selecione um médico" |
-| Data e hora | data-hora | sim | não pode ser futura (maior que o momento atual é futura; igual ou menor é aceita) | — / "A data da visita não pode estar no futuro" |
+| Data e hora | data-hora | sim | não pode ser futura (maior que o momento atual é futura; igual ou menor é aceita) | — / vazia: "Informe a data e a hora da visita"; futura: "A data da visita não pode estar no futuro" |
 | Notas | texto longo | sim | 10 a 1000 caracteres | "Resuma o que foi discutido (mín. 10 caracteres)" / "Informe de 10 a 1000 caracteres" |
 
 ## Interface (rotas e nomes de campo)

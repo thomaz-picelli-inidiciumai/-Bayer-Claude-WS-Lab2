@@ -43,6 +43,7 @@ Uma tela só está pronta quando:
 - Textos de interface em português do Brasil.
 - Acesso a dados via `app.db.conexao()`; SQL sempre parametrizado (`?`), nunca f-string com entrada do usuário.
 - DuckDB aceita um único processo de escrita: abrir conexão curta por requisição e fechá-la ao terminar.
+- Nunca abra uma conexão `conexao(...)` dentro de outra no mesmo processo: o DuckDB recusa ("different configuration"). Termine o bloco `with` de escrita antes de renderizar a tela, que abre uma conexão de leitura.
 - Toda funcionalidade nova vem com teste. Rode `pytest` antes de commitar.
 - Commits pequenos e frequentes, mensagem no imperativo.
 
