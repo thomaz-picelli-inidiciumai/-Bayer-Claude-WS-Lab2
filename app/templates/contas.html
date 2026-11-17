@@ -10,7 +10,7 @@
     <thead><tr><th>Nome</th><th>Especialidade</th><th>Cidade</th></tr></thead>
     <tbody>
     {% for id, nome, esp, cidade, uf in medicos %}
-      <tr><td><a href="/contas/{{ id }}">{{ nome }}</a></td><td>{{ esp }}</td><td>{{ cidade }}/{{ uf }}</td></tr>
+      <tr><td><a href="{{ rota('ficha', medico_id=id) }}">{{ nome }}</a></td><td>{{ esp }}</td><td>{{ cidade }}/{{ uf }}</td></tr>
     {% else %}
       <tr><td colspan="3" class="vazio">Nenhum médico encontrado.</td></tr>
     {% endfor %}

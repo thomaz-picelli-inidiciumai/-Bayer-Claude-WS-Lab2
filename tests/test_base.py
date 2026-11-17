@@ -49,3 +49,34 @@ def test_seed_e_deterministico(tmp_path):
         dados.append(con.execute("SELECT count(*), sum(medico_id) FROM visitas").fetchall())
         con.close()
     assert dados[0] == dados[1]
+
+
+def test_links_com_prefixo_de_proxy_por_variavel(client, monkeypatch):
+    monkeypatch.setenv("BAYVIVA_ROOT_PATH", "/proxy/8000")
+    r = client.get("/login", follow_redirects=False)
+    assert "/proxy/8000/static/style.css" in r.text
+    assert 'href="/proxy/8000/home"' in r.text
+    r = client.get("/contas")
+    assert 'action="/proxy/8000/contas"' in r.text
+    assert 'href="/proxy/8000/contas/1"' in r.text
+    r = client.get("/", follow_redirects=False)
+    assert r.headers["location"] == "/proxy/8000/login"
+
+
+def test_links_com_prefixo_de_proxy_por_header(client):
+    r = client.get("/home", headers={"X-Forwarded-Prefix": "/proxy/8001/"})
+    assert "/proxy/8001/static/style.css" in r.text
+    assert 'href="/proxy/8001/contas"' in r.text
+
+
+def test_sem_prefixo_links_continuam_na_raiz(client):
+    r = client.get("/home")
+    assert 'href="/static/style.css"' in r.text
+    assert 'href="/contas"' in r.text
+
+
+def test_proxy_que_nao_remove_o_prefixo(client, monkeypatch):
+    monkeypatch.setenv("BAYVIVA_ROOT_PATH", "/proxy/8000")
+    assert client.get("/proxy/8000/home").status_code == 200
+    assert client.get("/proxy/8000/static/style.css").status_code == 200
+    assert client.get("/home").status_code == 200

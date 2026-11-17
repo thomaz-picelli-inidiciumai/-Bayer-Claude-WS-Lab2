@@ -6,8 +6,10 @@ Registrar visita, painel e agenda são construídos nos Labs 1 e 2.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
+import jinja2
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -20,6 +22,30 @@ app = FastAPI(title="BayViva")
 app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
 templates = Jinja2Templates(directory=BASE / "templates")
 
+
+def prefixo(request: Request) -> str:
+    """Prefixo de caminho quando o app roda atrás de um proxy (ex.: /proxy/8000).
+
+    Vem do header X-Forwarded-Prefix ou de BAYVIVA_ROOT_PATH; vazio em execução local.
+    O host nunca entra: só o caminho, para funcionar em qualquer URL de participante.
+    """
+    valor = request.headers.get("x-forwarded-prefix") or os.environ.get("BAYVIVA_ROOT_PATH", "")
+    valor = valor.strip().strip("/")
+    return f"/{valor}" if valor else ""
+
+
+def rota(request: Request, destino: str, /, **params) -> str:
+    """Caminho (sem host) da rota `destino`, já com o prefixo do proxy."""
+    return prefixo(request) + str(request.app.url_path_for(destino, **params))
+
+
+@jinja2.pass_context
+def _rota_template(ctx, destino: str, /, **params) -> str:
+    return rota(ctx["request"], destino, **params)
+
+
+templates.env.globals["rota"] = _rota_template
+
 # Login sem senha: o botão Entrar leva ao usuário de demonstração.
 USUARIO_DEMO = {"nome": "Rep. Demonstração", "iniciais": "RD"}
 
@@ -28,9 +54,19 @@ def contexto(request: Request, **extra):
     return {"request": request, "usuario": USUARIO_DEMO, **extra}
 
 
+@app.middleware("http")
+async def aceitar_prefixo_do_proxy(request: Request, call_next):
+    """Se o proxy não remover o prefixo, remove aqui antes do roteamento."""
+    base = prefixo(request)
+    caminho = request.scope["path"]
+    if base and (caminho == base or caminho.startswith(base + "/")):
+        request.scope["path"] = caminho[len(base):] or "/"
+    return await call_next(request)
+
+
 @app.get("/")
-def raiz():
-    return RedirectResponse("/login")
+def raiz(request: Request):
+    return RedirectResponse(rota(request, "login"))
 
 
 @app.get("/login")

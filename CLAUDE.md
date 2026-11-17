@@ -9,6 +9,7 @@ CRM simplificado para representantes da indústria farmacêutica. Tudo é fictí
 - Instalar: `python -m venv .venv` e `.venv/Scripts/pip install -r requirements.txt` (Windows) ou `.venv/bin/pip ...`
 - Criar o banco: `python db/seed.py` (gera `db/bayviva.duckdb`, semente fixa)
 - Rodar o app: `uvicorn app.main:app --reload` e abrir http://127.0.0.1:8000
+- Rodar atrás do proxy da VM (URL `https://<host-do-participante>/proxy/8000/login`): `BAYVIVA_ROOT_PATH=/proxy/8000 uvicorn app.main:app --port 8000 --proxy-headers --forwarded-allow-ips='*'`. Na porta 8001 use `/proxy/8001` e outro banco em `BAYVIVA_DB`.
 - Testes: `pytest`
 
 ## Estrutura
@@ -18,6 +19,7 @@ CRM simplificado para representantes da indústria farmacêutica. Tudo é fictí
 - `tests/` testes pytest (banco temporário por teste, via fixture `client`)
 
 ## Convenções
+- Links e CSS nos templates usam `{{ rota('nome_da_rota', ...) }}` (caminho com prefixo do proxy, sem host); nunca `href="/..."` fixo.
 - Textos de interface em português do Brasil.
 - Acesso a dados via `app.db.conexao()`; SQL sempre parametrizado (`?`), nunca f-string com entrada do usuário.
 - DuckDB aceita um único processo de escrita: abrir conexão curta por requisição.
