@@ -11,6 +11,11 @@ uvicorn app.main:app --reload
 ```
 Abra http://127.0.0.1:8000 e clique em **Entrar**.
 
+Atrás do proxy da VM (`https://<seu-host>/proxy/8000/login`):
+```bash
+BAYVIVA_ROOT_PATH=/proxy/8000 uvicorn app.main:app --port 8000 --proxy-headers --forwarded-allow-ips='*'
+```
+
 ## O que já funciona
 Login, barra superior, home, contas (50 médicos de Cardiologia) com ficha.
 
