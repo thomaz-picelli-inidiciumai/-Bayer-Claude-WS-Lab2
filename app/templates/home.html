@@ -6,8 +6,8 @@
   <p>O que você quer fazer agora?</p>
 </div>
 <div class="atalhos">
-  <a class="tile" href="{{ rota('em_construcao', nome='visitas') }}"><span class="icone visita">V</span><div><strong>Registrar visita</strong><span class="desc">Grave o resultado de uma visita a um médico.</span></div></a>
-  <a class="tile" href="{{ rota('em_construcao', nome='insight') }}"><span class="icone insight">I</span><div><strong>Registrar insight</strong><span class="desc">Anote uma percepção de campo.</span></div></a>
-  <a class="tile" href="{{ rota('em_construcao', nome='nova-conta') }}"><span class="icone conta">C</span><div><strong>Nova conta</strong><span class="desc">Cadastre um novo médico.</span></div></a>
+  {% for a in atalhos %}
+  <a class="tile" href="{{ a.link }}"><span class="icone {{ a.cor }}">{{ a.letra }}</span><div><strong>{{ a.titulo }}</strong><span class="desc">{{ a.desc }}</span></div></a>
+  {% endfor %}
 </div>
 {% endblock %}

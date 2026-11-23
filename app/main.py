@@ -14,6 +14,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from starlette.routing import NoMatchFound
 
 from app.db import conexao
 
@@ -54,6 +55,38 @@ def contexto(request: Request, **extra):
     return {"request": request, "usuario": USUARIO_DEMO, **extra}
 
 
+# Ícones da home. Para uma tela nova, acrescente uma linha aqui:
+#   slug   : nome usado enquanto a tela está em construção (/em-construcao/<slug>)
+#   rota   : nome da função da rota real; quando ela existir, o ícone passa a levar a ela
+#   cor    : classe CSS do ícone (ver .icone.* em style.css)
+ATALHOS = [
+    {"slug": "visitas", "rota": "visitas_nova", "letra": "V", "cor": "visita",
+     "titulo": "Registrar visita", "desc": "Grave o resultado de uma visita a um médico."},
+    {"slug": "painel", "rota": "painel", "letra": "P", "cor": "painel",
+     "titulo": "Painel de médicos", "desc": "Veja a carteira e as visitas de cada médico."},
+    {"slug": "agenda", "rota": "agenda", "letra": "A", "cor": "agenda",
+     "titulo": "Agenda de visitas", "desc": "Consulte as visitas planejadas."},
+    {"slug": "insight", "rota": None, "letra": "I", "cor": "insight",
+     "titulo": "Registrar insight", "desc": "Anote uma percepção de campo."},
+    {"slug": "nova-conta", "rota": None, "letra": "C", "cor": "conta",
+     "titulo": "Nova conta", "desc": "Cadastre um novo médico."},
+]
+
+
+def atalhos_da_home(request: Request) -> list[dict]:
+    """ATALHOS com o link já resolvido: rota real se existir, senão 'em construção'."""
+    resultado = []
+    for a in ATALHOS:
+        try:
+            if not a["rota"]:
+                raise NoMatchFound(a["slug"], {})
+            link = rota(request, a["rota"])
+        except NoMatchFound:
+            link = rota(request, "em_construcao", nome=a["slug"])
+        resultado.append({**a, "link": link})
+    return resultado
+
+
 @app.middleware("http")
 async def aceitar_prefixo_do_proxy(request: Request, call_next):
     """Se o proxy não remover o prefixo, remove aqui antes do roteamento."""
@@ -76,7 +109,9 @@ def login(request: Request):
 
 @app.get("/home")
 def home(request: Request):
-    return templates.TemplateResponse(request, "home.html", contexto(request, ativo="home"))
+    return templates.TemplateResponse(
+        request, "home.html", contexto(request, ativo="home", atalhos=atalhos_da_home(request))
+    )
 
 
 @app.get("/contas")
