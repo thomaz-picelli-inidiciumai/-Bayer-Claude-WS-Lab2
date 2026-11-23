@@ -80,3 +80,33 @@ def test_proxy_que_nao_remove_o_prefixo(client, monkeypatch):
     assert client.get("/proxy/8000/home").status_code == 200
     assert client.get("/proxy/8000/static/style.css").status_code == 200
     assert client.get("/home").status_code == 200
+
+
+def test_home_tem_icone_para_cada_tela_das_specs(client):
+    r = client.get("/home")
+    for titulo in ("Registrar visita", "Painel de médicos", "Agenda de visitas"):
+        assert titulo in r.text
+    assert 'href="/em-construcao/visitas"' in r.text
+    assert 'href="/em-construcao/painel"' in r.text
+    assert 'href="/em-construcao/agenda"' in r.text
+
+
+def test_home_icone_aponta_para_a_rota_real_quando_ela_existe(client):
+    from app.main import app
+
+    def painel():
+        return "ok"
+
+    app.add_api_route("/painel", painel, name="painel")
+    try:
+        r = client.get("/home")
+        assert '<a class="tile" href="/painel">' in r.text
+        assert '<a class="tile" href="/em-construcao/painel">' not in r.text
+        assert '<a class="tile" href="/em-construcao/agenda">' in r.text
+    finally:
+        app.router.routes.pop()
+
+
+def test_home_icone_respeita_prefixo_de_proxy(client):
+    r = client.get("/home", headers={"X-Forwarded-Prefix": "/proxy/8001"})
+    assert 'href="/proxy/8001/em-construcao/agenda"' in r.text
