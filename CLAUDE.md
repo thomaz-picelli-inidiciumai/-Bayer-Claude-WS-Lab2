@@ -42,6 +42,7 @@ Uma tela só está pronta quando:
 
 ## Convenções
 - Links e CSS nos templates usam `{{ rota('nome_da_rota', ...) }}` (caminho com prefixo do proxy, sem host); nunca `href="/..."` fixo.
+- A home gera os ícones a partir de `ATALHOS` em `app/main.py`. Cada ícone aponta sozinho para a rota real quando existe uma função com o nome indicado ali (`visitas_nova`, `painel`, `agenda`); para uma tela nova, acrescente uma linha em `ATALHOS`.
 - Textos de interface em português do Brasil.
 - Acesso a dados via `app.db.conexao()`; SQL sempre parametrizado (`?`), nunca f-string com entrada do usuário.
 - DuckDB aceita um único processo de escrita: abrir conexão curta por requisição e fechá-la ao terminar.

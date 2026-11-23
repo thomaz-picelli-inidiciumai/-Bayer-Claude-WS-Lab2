@@ -17,7 +17,7 @@ Permitir que o representante registre uma visita realizada a um médico, para qu
 | Notas | texto longo | sim | 10 a 1000 caracteres | "Resuma o que foi discutido (mín. 10 caracteres)" / "Informe de 10 a 1000 caracteres" |
 
 ## Interface (rotas e nomes de campo)
-- `GET /visitas/nova`: exibe o formulário (200).
+- `GET /visitas/nova`: exibe o formulário (200). A função da rota se chama `visitas_nova` (é por esse nome que o ícone da home passa a apontar para a tela).
 - `POST /visitas/nova`: campos de formulário `medico_id`, `data_hora` (formato `AAAA-MM-DDTHH:MM`, como o input `datetime-local`) e `notas`.
   - Sucesso: 200, página com a mensagem "Visita registrada com sucesso".
   - Erro de validação: 422, nada é gravado e cada mensagem aparece junto do campo.

@@ -14,7 +14,7 @@ Mostrar ao representante a carteira priorizada pelo tempo desde a última visita
 Nome (link para a ficha), especialidade, data da última visita (dd/mm/aaaa) e "há N dias". Filtro de especialidade com a lista de valores existentes em `medicos` mais "Todas". Busca por nome com placeholder "Buscar por nome".
 
 ## Interface (rotas e nomes de campo)
-`GET /painel` com parâmetros opcionais na URL: `especialidade` (valor exato; vazio ou ausente = todas), `q` (parte do nome) e `pagina` (inteiro a partir de 1; inválido volta para 1).
+`GET /painel` (a função da rota se chama `painel`; é por esse nome que o ícone da home passa a apontar para a tela) com parâmetros opcionais na URL: `especialidade` (valor exato; vazio ou ausente = todas), `q` (parte do nome) e `pagina` (inteiro a partir de 1; inválido volta para 1).
 
 ## Estados da tela
 - **Vazio:** "Nenhum médico encontrado para os filtros aplicados".

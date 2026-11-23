@@ -14,7 +14,7 @@ Permitir que o representante veja e planeje suas visitas por dia na semana.
 Médico (obrigatório, lista), data (obrigatória, dia útil), hora (obrigatória, de 08:00 a 18:00 em intervalos de 30 min). Mensagens de erro ao lado do campo.
 
 ## Interface (rotas e nomes de campo)
-- `GET /agenda?semana=AAAA-MM-DD`: mostra segunda a sexta da semana que contém essa data; sem o parâmetro, a semana atual.
+- `GET /agenda?semana=AAAA-MM-DD`: mostra segunda a sexta da semana que contém essa data; sem o parâmetro, a semana atual. A função da rota se chama `agenda` (é por esse nome que o ícone da home passa a apontar para a tela).
 - `POST /agenda/nova`: campos `medico_id`, `data` (`AAAA-MM-DD`) e `hora` (`HH:MM`). Sucesso: 303 para `/agenda?semana=<data>`. Erro de validação ou conflito: 422, nada é gravado.
 
 ## Estados da tela
