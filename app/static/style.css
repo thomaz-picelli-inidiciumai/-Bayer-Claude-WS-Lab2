@@ -67,6 +67,8 @@ main { padding: 12px 16px 32px; max-width: 1200px; margin: 0 auto; }
 .icone.conta { background: #7f8de1; }
 .icone.visita { background: #fe9339; }
 .icone.insight { background: #f2cf5b; }
+.icone.painel { background: #5fb3a1; }
+.icone.agenda { background: #c97ab2; }
 
 /* Botões */
 .btn { display: inline-flex; align-items: center; height: 32px; padding: 0 16px; border: 1px solid var(--border-strong); border-radius: var(--radius);
