@@ -86,27 +86,45 @@ def test_home_tem_icone_para_cada_tela_das_specs(client):
     r = client.get("/home")
     for titulo in ("Registrar visita", "Painel de médicos", "Agenda de visitas"):
         assert titulo in r.text
-    assert 'href="/em-construcao/visitas"' in r.text
-    assert 'href="/em-construcao/painel"' in r.text
-    assert 'href="/em-construcao/agenda"' in r.text
+    # as três telas já existem: os ícones levam às rotas reais, não a "em construção"
+    assert '<a class="tile" href="/visitas/nova">' in r.text
+    assert '<a class="tile" href="/painel">' in r.text
+    assert '<a class="tile" href="/agenda">' in r.text
+    for tela in ("visitas", "painel", "agenda"):
+        assert f"/em-construcao/{tela}" not in r.text
+    # as extensões continuam em construção
+    assert '<a class="tile" href="/em-construcao/insight">' in r.text
+    assert '<a class="tile" href="/em-construcao/nova-conta">' in r.text
 
 
-def test_home_icone_aponta_para_a_rota_real_quando_ela_existe(client):
-    from app.main import app
+def test_home_icone_aponta_para_a_rota_real_quando_ela_existe(client, monkeypatch):
+    """O ícone se liga sozinho quando existe uma função de rota com o nome indicado em ATALHOS."""
+    import app.main as main
 
-    def painel():
+    atalhos = [{**a, "rota": "insight_teste"} if a["slug"] == "insight" else a for a in main.ATALHOS]
+    monkeypatch.setattr(main, "ATALHOS", atalhos)
+    assert '<a class="tile" href="/em-construcao/insight">' in client.get("/home").text
+
+    def insight_teste():
         return "ok"
 
-    app.add_api_route("/painel", painel, name="painel")
+    main.app.add_api_route("/insight-teste", insight_teste, name="insight_teste")
     try:
         r = client.get("/home")
-        assert '<a class="tile" href="/painel">' in r.text
-        assert '<a class="tile" href="/em-construcao/painel">' not in r.text
-        assert '<a class="tile" href="/em-construcao/agenda">' in r.text
+        assert '<a class="tile" href="/insight-teste">' in r.text
+        assert '<a class="tile" href="/em-construcao/insight">' not in r.text
     finally:
-        app.router.routes.pop()
+        main.app.router.routes.pop()
 
 
 def test_home_icone_respeita_prefixo_de_proxy(client):
     r = client.get("/home", headers={"X-Forwarded-Prefix": "/proxy/8001"})
-    assert 'href="/proxy/8001/em-construcao/agenda"' in r.text
+    assert 'href="/proxy/8001/agenda"' in r.text
+    assert 'href="/proxy/8001/visitas/nova"' in r.text
+    assert 'href="/proxy/8001/em-construcao/insight"' in r.text
+
+
+def test_menu_superior_leva_as_telas_reais(client):
+    r = client.get("/home")
+    for caminho in ("/visitas/nova", "/painel", "/agenda"):
+        assert f'<a href="{caminho}" class=' in r.text
