@@ -1,0 +1,54 @@
+{# Componentes de interface reutilizados pelas telas de visitas, painel e agenda. #}
+
+{# Campo de formulário com rótulo, dica e mensagem de erro junto do campo. #}
+{% macro campo(nome, rotulo, erro="", largo=false, dica="", obrigatorio=true) %}
+<div class="campo-form{{ ' largo' if largo }}{{ ' com-erro' if erro }}">
+  <label for="{{ nome }}">{{ rotulo }}{% if obrigatorio %} <span class="obrig" aria-hidden="true">*</span>{% endif %}</label>
+  {{ caller() }}
+  {% if dica %}<div class="dica">{{ dica }}</div>{% endif %}
+  <p class="erro-campo" id="erro-{{ nome }}" data-erro-de="{{ nome }}" role="alert"{% if not erro %} hidden{% endif %}>{{ erro }}</p>
+</div>
+{% endmacro %}
+
+{# Pop-up com a lista do que está errado. Abre sozinho quando o servidor devolve erros. #}
+{% macro dialogo_erros(erros, rotulos, titulo="Revise os campos") %}
+<dialog id="dlg-erros" class="modal erro" aria-labelledby="dlg-erros-t" data-foca-erro{% if erros %} open data-modal{% endif %}>
+  <div class="modal-topo"><span class="modal-icone" aria-hidden="true">!</span><h2 id="dlg-erros-t">{{ titulo }}</h2></div>
+  <div class="modal-corpo">
+    <p>Nada foi gravado. Corrija o que está indicado abaixo e tente de novo.</p>
+    <ul class="lista-erros" data-lista-erros>
+      {% for nome, msg in erros.items() %}<li><strong>{{ rotulos.get(nome, nome) }}:</strong> {{ msg }}</li>{% endfor %}
+    </ul>
+  </div>
+  <div class="modal-rodape"><button type="button" class="btn brand" data-fechar autofocus>Entendi</button></div>
+</dialog>
+{% endmacro %}
+
+{# Pop-up de falha (banco indisponível etc.). #}
+{% macro dialogo_falha(mensagem, titulo="Não foi possível salvar") %}
+<dialog id="dlg-falha" class="modal erro" aria-labelledby="dlg-falha-t" open data-modal role="alertdialog">
+  <div class="modal-topo"><span class="modal-icone" aria-hidden="true">!</span><h2 id="dlg-falha-t">{{ titulo }}</h2></div>
+  <div class="modal-corpo"><p>{{ mensagem }}</p></div>
+  <div class="modal-rodape"><button type="button" class="btn brand" data-fechar autofocus>Fechar</button></div>
+</dialog>
+{% endmacro %}
+
+{# Pop-up de sucesso; o conteúdo e as ações vêm do bloco {% call %}. #}
+{% macro dialogo_sucesso(titulo) %}
+<dialog id="dlg-sucesso" class="modal sucesso" aria-labelledby="dlg-sucesso-t" open data-modal>
+  <div class="modal-topo"><span class="modal-icone" aria-hidden="true">✓</span><h2 id="dlg-sucesso-t">{{ titulo }}</h2></div>
+  {{ caller() }}
+</dialog>
+{% endmacro %}
+
+{# Aviso temporário no canto da tela (some sozinho). #}
+{% macro toast(mensagem, tipo="sucesso") %}
+<div class="toast {{ tipo }}" role="status" aria-live="polite" data-auto>
+  <span class="toast-icone" aria-hidden="true">{{ '✓' if tipo == 'sucesso' else '!' }}</span>
+  <span class="toast-texto">{{ mensagem }}</span>
+  <button type="button" class="toast-x" data-fechar-toast aria-label="Fechar aviso">×</button>
+</div>
+{% endmacro %}
+
+{# Selo de urgência por dias desde a última visita. #}
+{% macro selo(classe, texto) %}<span class="selo {{ classe }}">{{ texto }}</span>{% endmacro %}

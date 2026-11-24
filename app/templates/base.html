@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block titulo %}BayViva{% endblock %}</title>
   <link rel="stylesheet" href="{{ rota('static', path='style.css') }}">
+  <script src="{{ rota('static', path='app.js') }}" defer></script>
 </head>
 <body class="{% block classe_body %}{% endblock %}">
   {% block corpo %}
@@ -14,7 +15,7 @@
       <input type="search" name="q" placeholder="Pesquisar médicos..." aria-label="Pesquisar">
     </form>
     <details class="usuario">
-      <summary><span class="avatar">{{ usuario.iniciais }}</span> {{ usuario.nome }}</summary>
+      <summary><span class="avatar">{{ usuario.iniciais }}</span> <span class="nome-usuario">{{ usuario.nome }}</span></summary>
       <ul>
         <li><a href="{{ rota('em_construcao', nome='configuracoes') }}">Configurações</a></li>
         <li><a href="{{ rota('login') }}">Sair</a></li>
@@ -26,9 +27,9 @@
     <div class="menu">
       <a href="{{ rota('home') }}" class="{{ 'ativo' if ativo == 'home' }}">Home</a>
       <a href="{{ rota('contas') }}" class="{{ 'ativo' if ativo == 'contas' }}">Contas</a>
-      <a href="{{ rota('em_construcao', nome='visitas') }}" class="{{ 'ativo' if ativo == 'visitas' }}">Visitas</a>
-      <a href="{{ rota('em_construcao', nome='painel') }}" class="{{ 'ativo' if ativo == 'painel' }}">Painel</a>
-      <a href="{{ rota('em_construcao', nome='agenda') }}" class="{{ 'ativo' if ativo == 'agenda' }}">Agenda</a>
+      <a href="{{ rota('visitas_nova') }}" class="{{ 'ativo' if ativo == 'visitas' }}">Visitas</a>
+      <a href="{{ rota('painel') }}" class="{{ 'ativo' if ativo == 'painel' }}">Painel</a>
+      <a href="{{ rota('agenda') }}" class="{{ 'ativo' if ativo == 'agenda' }}">Agenda</a>
     </div>
   </nav>
   <main>{% block conteudo %}{% endblock %}</main>
