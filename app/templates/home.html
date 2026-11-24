@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block titulo %}Home · BayViva{% endblock %}
+{% block conteudo %}
+<div class="boas-vindas">
+  <h1>Olá, {{ usuario.nome }}</h1>
+  <p>O que você quer fazer agora?</p>
+</div>
+<div class="atalhos">
+  {% for a in atalhos %}
+  <a class="tile" href="{{ a.link }}"><span class="icone {{ a.cor }}">{{ a.letra }}</span><div><strong>{{ a.titulo }}</strong><span class="desc">{{ a.desc }}</span></div></a>
+  {% endfor %}
+</div>
+{% endblock %}
