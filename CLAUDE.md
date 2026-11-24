@@ -15,6 +15,7 @@ CRM simplificado para representantes da indústria farmacêutica. Tudo é fictí
 
 ## Estrutura
 - `app/main.py` rotas; `app/db.py` conexão DuckDB; `app/regras.py` validações puras; `app/relogio.py` "agora" do app; `app/templates/` telas (`_ui.html` tem os componentes: campo, pop-ups, aviso); `app/static/` CSS e `app.js` (validação no navegador, pop-ups)
+- `docs/specs/design-system.md` tokens e regras do visual (tema terminal); o `:root` de `app/static/style.css` é a fonte dos valores, e nenhuma cor/fonte/raio/sombra fica fora dele
 - `db/schema.sql` e `db/seed.py` schema e dados sintéticos
 - `docs/specs/` specs: `00-visao-geral.md`, `TEMPLATE.md`, `lab1-specs/`, `lab2-specs/`
 - `tests/` testes pytest (banco temporário por teste, via fixture `client`)
@@ -32,7 +33,7 @@ Siga esta ordem para qualquer tela nova:
 
 ## Ferramentas do projeto
 - **Servidor MCP `bayviva`** (somente leitura): `listar_tabelas`, `descrever_tabela`, `consultar` (um SELECT, até 500 linhas). Serve para inspecionar o banco real do app. Ele não grava: as gravações são feitas pelo app. Confira com `/mcp`.
-- **Skills:** `/checar-spec`, `/spec-para-testes`, `/verificar-gravacao`.
+- **Skills:** `/checar-spec`, `/spec-para-testes`, `/verificar-gravacao`, `/redesenhar-visual` (entrevista e troca o design system inteiro: cores, fontes, formas, tema, marca).
 
 ## Definição de pronto
 Uma tela só está pronta quando:
