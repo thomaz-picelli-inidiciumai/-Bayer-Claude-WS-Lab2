@@ -27,5 +27,34 @@ Médico (obrigatório, lista), data (obrigatória, dia útil), hora (obrigatóri
 - Horário único no fuso America/Sao_Paulo; `data_hora` armazenada sem fuso, nesse horário local.
 - Duração fixa de 30 minutos.
 
+## Critérios de aceite adicionais (experiência e robustez)
+6. **Dado** uma data de fim de semana, **quando** tento adicionar, **então** vejo "Escolha um dia útil" e nada é gravado (422).
+7. **Dado** uma hora fora da grade (antes de 08:00, depois de 18:00 ou fora dos intervalos de 30 minutos), **quando** tento adicionar, **então** vejo "Escolha um horário entre 08:00 e 18:00, de 30 em 30 minutos" (422). O horário 18:00 é aceito.
+8. **Dado** uma data de hoje com hora que já passou, **quando** tento adicionar, **então** vejo "Escolha um horário futuro". "Futuro" é estritamente maior que o momento atual.
+9. **Dado** uma visita adicionada com sucesso, **quando** a agenda recarrega (303), **então** vejo uma mensagem "Visita agendada para <dd/mm> às <HH:MM>" uma única vez (não reaparece ao recarregar a página).
+10. **Dado** uma visita `planejada` do representante 1, **quando** clico em "Cancelar" e confirmo, **então** `POST /agenda/{id}/cancelar` muda o status para `cancelada`, responde 303 para a semana da visita e a visita aparece riscada. Visita inexistente, de outro representante ou que não esteja `planejada` responde 404 e nada muda.
+11. **Dado** uma falha do banco ao gravar, **quando** tento adicionar ou cancelar, **então** a resposta é 500, nada é gravado e vejo "Não foi possível salvar. Nada foi gravado. Tente novamente."
+12. **Dado** `semana` inválida (texto que não é data), **quando** abro a agenda, **então** vejo a semana atual.
+
+## Dados e regras adicionais
+- A agenda mostra apenas visitas do representante 1, com status `planejada` ou `cancelada`. Visitas `realizada` não aparecem.
+- A verificação de conflito e a gravação ocorrem na mesma transação.
+- O conflito considera só visitas `planejada` do mesmo representante e o mesmo `data_hora`.
+
+## Decisões de detalhe (resposta ao /checar-spec)
+- Dia útil é segunda a sexta; feriados não são considerados.
+- Validação nesta ordem, uma mensagem por campo: médico ("Selecione um médico"); data vazia ou inválida ("Informe a data"), fim de semana ("Escolha um dia útil"); hora vazia ou fora da grade (mensagem do critério 7); depois, só se data e hora forem válidas, passado ("Escolha um horário futuro") e conflito ("Já existe uma visita neste horário").
+- "Escolha um horário futuro" e "Já existe uma visita neste horário" aparecem junto do campo Hora.
+- A semana é a civil (segunda a domingo) que contém a data de `semana`; a tela mostra segunda a sexta dela. Sábado e domingo pertencem à semana que acabou de passar.
+- "Hoje" é a data de America/Sao_Paulo; se hoje for fim de semana, a "semana atual" é essa mesma semana civil.
+
+## Experiência
+- Em tela larga, cinco colunas (segunda a sexta) com o dia de hoje destacado; abaixo de 900 px os dias empilham.
+- O formulário "Nova visita" abre em pop-up, pelo botão geral ou pelo "+ Agendar" de cada dia (que preenche a data). Hora é uma lista com os 21 horários da grade; data tem `min` igual a hoje.
+- Em caso de erro (422) a semana certa é exibida, o pop-up abre de novo com os dados mantidos, as mensagens junto de cada campo e um resumo.
+- Cancelar pede confirmação em pop-up.
+- A mensagem de sucesso usa um cookie de aviso de uso único, para não alterar o `Location` do 303.
+- Navegação "Semana anterior", "Hoje" e "Próxima semana" com o intervalo da semana no título.
+
 ## Fora de escopo
 Fusos múltiplos, recorrência, sincronização com calendário externo, arrastar e soltar.

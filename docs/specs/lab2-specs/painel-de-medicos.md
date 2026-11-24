@@ -23,5 +23,25 @@ Nome (link para a ficha), especialidade, data da última visita (dd/mm/aaaa) e "
 ## Dados e regras
 `medicos` com `LEFT JOIN` na última `visitas.data_hora` com status `realizada`. Dias desde a visita contados a partir da data atual do app.
 
+## Critérios de aceite adicionais (experiência e robustez)
+6. **Dado** o painel aberto, **quando** vejo o topo da tela, **então** há três cartões de resumo sobre a carteira inteira (sem considerar filtros): total de médicos, médicos sem nenhuma visita realizada e médicos sem visita realizada há mais de 90 dias (inclui os que nunca tiveram).
+7. **Dado** a coluna "há N dias", **quando** vejo cada linha, **então** há um selo: verde até 30 dias, âmbar de 31 a 90, vermelho acima de 90 dias ou "Sem visita".
+8. **Dado** `pagina` maior que a última página, **quando** abro o painel, **então** vejo a última página.
+9. **Dado** cada linha do painel, **quando** clico em "Registrar visita", **então** vou para `/visitas/nova?medico_id=<id>` com o médico selecionado.
+10. **Dado** uma falha do banco, **quando** abro o painel, **então** a resposta é 500 com "Não foi possível carregar o painel. Tente novamente." e um botão "Tentar novamente".
+
+## Decisões de detalhe (resposta ao /checar-spec)
+- A "última visita" considera visitas `realizada` de qualquer representante (a carteira é todos os médicos).
+- A busca por nome ignora maiúsculas, mas diferencia acentos; os espaços nas pontas de `q` são removidos.
+- Visita feita hoje mostra "hoje" em vez de "há 0 dias"; 1 dia mostra "há 1 dia".
+- `especialidade` que não existe em `medicos` resulta no estado vazio, sem ignorar o filtro.
+- "Hoje" vem de America/Sao_Paulo.
+
+## Experiência
+- Filtros em formulário `GET` (especialidade, busca por nome e botão "Limpar"), que funciona sem JavaScript; os links de página preservam os filtros.
+- Layout em largura total. Abaixo de 720 px cada médico vira um cartão empilhado; a paginação continua alcançável com o polegar.
+- Ordem do desempate: nome em ordem alfabética.
+- Rodapé da tabela: "Mostrando X–Y de Z médicos".
+
 ## Fora de escopo
 Metas, alertas, exportação, múltiplos representantes.
