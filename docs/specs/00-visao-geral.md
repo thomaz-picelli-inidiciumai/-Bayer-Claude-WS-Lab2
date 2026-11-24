@@ -9,9 +9,9 @@ Representante de vendas (usuário de demonstração: Rep. Demonstração, repres
 | Tela | Estado na base |
 | --- | --- |
 | Login, barra superior, home, contas e ficha do médico | Prontas |
-| Registrar visita | A construir (Labs 1 e 2) |
-| Painel de médicos a visitar | A construir |
-| Agenda de visitas | A construir |
+| Registrar visita | Pronta (Lab 2) |
+| Painel de médicos a visitar | Pronta (Lab 2) |
+| Agenda de visitas | Pronta (Lab 2) |
 | Registrar insight, Nova conta | Botões sem funcionalidade (extensão) |
 
 ## Dados (DuckDB, `db/schema.sql`)

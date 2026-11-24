@@ -33,5 +33,27 @@ Permitir que o representante registre uma visita realizada a um médico, para qu
 - Status gravado: sempre `realizada`. Representante: o usuário logado (fixo em 1 na base).
 - Notas não podem conter e-mail ou telefone (dado pessoal): rejeitar com "Remova dados pessoais das notas". Considere e-mail qualquer texto com `@`, e telefone qualquer sequência de 8 ou mais dígitos (com ou sem espaços, hífens ou parênteses).
 
+## Critérios de aceite adicionais (experiência e robustez)
+5. **Dado** o formulário válido e uma falha do banco ao gravar, **quando** clico em Salvar, **então** nada é gravado, a resposta é 500, vejo o pop-up "Não foi possível salvar. Nada foi gravado. Tente novamente." e os dados digitados continuam no formulário.
+6. **Dado** que já existe visita `realizada` do mesmo médico no mesmo `data_hora`, **quando** clico em Salvar, **então** nada é gravado, a resposta é 422 e vejo "Esta visita já foi registrada".
+7. **Dado** `GET /visitas/nova?medico_id=N` com N existente, **quando** abro a tela, **então** o médico N vem selecionado; N inexistente ou inválido é ignorado (lista em "Selecione um médico").
+8. **Dado** um envio com erro de validação, **quando** a resposta chega, **então** além do erro junto de cada campo vejo um pop-up que lista cada problema e o motivo; o pop-up de sucesso só aparece depois que a linha foi gravada e lida de volta do banco.
+9. **Dado** um campo inválido, **quando** clico em Salvar no navegador, **então** a validação no cliente impede o envio e mostra o mesmo pop-up e as mesmas mensagens do servidor. *Verificação manual.*
+
+## Decisões de detalhe (resposta ao /checar-spec)
+- Notas: espaços nas pontas são removidos antes de validar e de gravar; o limite de 10 a 1000 conta o texto já aparado.
+- "Momento atual" é o horário de America/Sao_Paulo (o mesmo da agenda); `data_hora` é gravado sem fuso, nesse horário local.
+- Um campo mostra no máximo uma mensagem, na ordem: vazio, tamanho, dado pessoal ("Remova dados pessoais das notas").
+- "Esta visita já foi registrada" aparece junto do campo Data e hora. Data e hora em formato inválido é tratada como vazia.
+- `medico_id` que não seja número inteiro existente é tratado como não selecionado.
+
+## Experiência
+- **Pop-up de sucesso:** título "Visita registrada com sucesso", resumo (médico, data e hora) e ações "Ver painel" e "Registrar outra". Fecha com Esc ou botão.
+- **Pop-up de erro:** lista as mensagens por campo; ao fechar, o foco vai para o primeiro campo com erro.
+- **Notas:** contador "n/1000" ao vivo; o campo de data e hora recebe `max` igual ao momento atual do servidor.
+- **Layout:** formulário ocupa a largura útil da tela, em duas colunas a partir de 900 px e uma coluna abaixo disso; botões com área de toque de pelo menos 40 px.
+- **Acessibilidade:** mensagens de erro ligadas ao campo (`aria-describedby`), `aria-live` para avisos, diálogo com foco preso.
+- **Sem JavaScript** a tela continua funcionando: o servidor valida e renderiza tudo.
+
 ## Fora de escopo
 Edição ou exclusão de visitas, anexos, múltiplos representantes, visitas planejadas (são da agenda).

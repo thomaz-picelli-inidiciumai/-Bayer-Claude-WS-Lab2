@@ -11,9 +11,10 @@ CRM simplificado para representantes da indústria farmacêutica. Tudo é fictí
 - Rodar o app: `uvicorn app.main:app --reload` e abrir http://127.0.0.1:8000
 - Rodar atrás do proxy da VM (URL `https://<host-do-participante>/proxy/8000/login`): `BAYVIVA_ROOT_PATH=/proxy/8000 uvicorn app.main:app --port 8000 --proxy-headers --forwarded-allow-ips='*'`. Na porta 8001 use `/proxy/8001` e outro banco em `BAYVIVA_DB`.
 - Testes: `pytest`
+- Relógio do app: horário real de America/Sao_Paulo. Para demonstrar com os dados do seed (referência 04/11/2026) use `BAYVIVA_AGORA=2026-11-04T08:00` antes do `uvicorn`; os testes já fixam esse valor. Sem ele, as visitas planejadas do seed ficam no passado e a agenda abre vazia.
 
 ## Estrutura
-- `app/main.py` rotas; `app/db.py` conexão DuckDB; `app/templates/` telas; `app/static/` CSS
+- `app/main.py` rotas; `app/db.py` conexão DuckDB; `app/regras.py` validações puras; `app/relogio.py` "agora" do app; `app/templates/` telas (`_ui.html` tem os componentes: campo, pop-ups, aviso); `app/static/` CSS e `app.js` (validação no navegador, pop-ups)
 - `db/schema.sql` e `db/seed.py` schema e dados sintéticos
 - `docs/specs/` specs: `00-visao-geral.md`, `TEMPLATE.md`, `lab1-specs/`, `lab2-specs/`
 - `tests/` testes pytest (banco temporário por teste, via fixture `client`)

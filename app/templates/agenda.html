@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% from "_ui.html" import campo, dialogo_erros, dialogo_falha, toast %}
+{% block titulo %}Agenda de visitas · BayViva{% endblock %}
+{% block conteudo %}
+<div class="page-header">
+  <span class="icone agenda">A</span>
+  <div><div class="sub">Agenda</div><h1>Agenda de visitas</h1></div>
+  <div class="acoes"><button type="button" class="btn brand" data-abrir="dlg-agendar">Agendar visita</button></div>
+</div>
+
+{% if aviso %}{{ toast(aviso) }}{% endif %}
+
+<nav class="semana-nav" aria-label="Navegação entre semanas">
+  <a class="btn" href="{{ url_anterior }}" rel="prev">← Semana anterior</a>
+  <a class="btn" href="{{ rota('agenda') }}">Hoje</a>
+  <h2>{{ titulo_semana }}</h2>
+  <a class="btn" href="{{ url_proxima }}" rel="next">Próxima semana →</a>
+</nav>
+
+{% if erro_leitura %}
+<div class="card"><div class="corpo erro-painel" role="alert">
+  <p>{{ erro_leitura }}</p>
+  <a class="btn brand" href="{{ rota('agenda') }}">Tentar novamente</a>
+</div></div>
+{% else %}
+<div class="semana">
+  {% for d in dias %}
+  <section class="dia{{ ' hoje' if d.hoje }}" data-dia="{{ d.iso }}" aria-label="{{ d.nome }}, {{ d.curto }}">
+    <header><strong>{{ d.nome }}</strong><span>{{ d.curto }}{% if d.hoje %} · hoje{% endif %}</span></header>
+    <ul class="itens">
+      {% for v in d.visitas %}
+      <li class="visita-item {{ v.status }}" data-visita="{{ v.id }}">
+        <span class="hora">{{ v.hora }}</span>
+        <span class="medico">{{ v.medico }}</span>
+        <div class="linha">
+          <span class="estado">{{ "Cancelada" if v.status == "cancelada" else "Planejada" }}</span>
+          {% if v.status == "planejada" %}
+          <button type="button" class="btn pequeno" data-cancelar-visita
+                  data-acao="{{ rota('agenda_cancelar', visita_id=v.id) }}" data-resumo="{{ v.resumo }}">Cancelar</button>
+          {% endif %}
+        </div>
+      </li>
+      {% else %}
+      <li class="sem-visitas">Sem visitas</li>
+      {% endfor %}
+    </ul>
+    <footer><button type="button" class="btn pequeno" data-abrir="dlg-agendar" data-data="{{ d.iso }}">+ Agendar</button></footer>
+  </section>
+  {% endfor %}
+</div>
+{% endif %}
+
+<dialog id="dlg-agendar" class="modal largo" aria-labelledby="dlg-agendar-t"{% if erros %} open data-modal{% endif %}>
+  <form method="post" action="{{ rota('agenda_nova') }}" novalidate id="form-agenda" data-valida="agenda" data-agora="{{ agora_iso }}">
+    <input type="hidden" name="semana" value="{{ semana_iso }}">
+    <div class="modal-topo"><span class="modal-icone" aria-hidden="true">+</span><h2 id="dlg-agendar-t">Agendar visita</h2></div>
+    <div class="modal-corpo">
+      <p class="lead">Cada visita dura 30 minutos. Escolha um dia útil e um horário futuro.</p>
+      <div class="form-grid">
+        {% call campo("medico_id", "Médico", erros.medico_id, largo=true) %}
+        <select id="medico_id" name="medico_id" required{% if erros.medico_id %} aria-invalid="true" aria-describedby="erro-medico_id"{% endif %}>
+          <option value="">Selecione um médico</option>
+          {% for id, nome in medicos %}<option value="{{ id }}"{% if v.medico_id == id %} selected{% endif %}>{{ nome }}</option>
+          {% endfor %}
+        </select>
+        {% endcall %}
+        {% call campo("data", "Data", erros.data) %}
+        <input type="date" id="data" name="data" value="{{ v.data }}" min="{{ hoje_iso }}" required{% if erros.data %} aria-invalid="true" aria-describedby="erro-data"{% endif %}>
+        {% endcall %}
+        {% call campo("hora", "Hora", erros.hora) %}
+        <select id="hora" name="hora" required{% if erros.hora %} aria-invalid="true" aria-describedby="erro-hora"{% endif %}>
+          <option value="">Selecione</option>
+          {% for h in horas %}<option value="{{ h }}"{% if v.hora == h %} selected{% endif %}>{{ h }}</option>
+          {% endfor %}
+        </select>
+        {% endcall %}
+      </div>
+    </div>
+    <div class="modal-rodape">
+      <button type="button" class="btn" data-fechar>Cancelar</button>
+      <button type="submit" class="btn brand" data-enviar>Agendar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-cancelar" class="modal erro" aria-labelledby="dlg-cancelar-t">
+  <form method="post" action="">
+    <div class="modal-topo"><span class="modal-icone" aria-hidden="true">!</span><h2 id="dlg-cancelar-t">Cancelar esta visita?</h2></div>
+    <div class="modal-corpo">
+      <p><strong data-resumo-visita></strong></p>
+      <p>A visita ficará riscada na agenda e o horário será liberado.</p>
+    </div>
+    <div class="modal-rodape">
+      <button type="button" class="btn" data-fechar>Manter visita</button>
+      <button type="submit" class="btn perigo">Cancelar visita</button>
+    </div>
+  </form>
+</dialog>
+
+{{ dialogo_erros(erros, rotulos, "Revise os campos") }}
+{% if falha and not erro_leitura %}{{ dialogo_falha(falha) }}{% endif %}
+{% endblock %}

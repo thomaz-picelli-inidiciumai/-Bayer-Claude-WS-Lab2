@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% from "_ui.html" import campo, dialogo_erros, dialogo_falha, dialogo_sucesso %}
+{% block titulo %}Registrar visita · BayViva{% endblock %}
+{% block conteudo %}
+<div class="page-header">
+  <span class="icone visita">V</span>
+  <div><div class="sub">Visitas</div><h1>Registrar visita</h1></div>
+  <div class="acoes"><a class="btn" href="{{ rota('painel') }}">Ver painel</a></div>
+</div>
+
+{% if sucesso %}
+<div class="aviso sucesso" role="status">
+  <strong>Visita registrada com sucesso.</strong>
+  {{ sucesso.medico }}, {{ sucesso.quando }}. <a href="{{ rota('painel') }}">Ver painel</a>
+</div>
+{% endif %}
+
+<div class="card">
+  <header><h2>Nova visita</h2><span class="sub">Campos com <span class="obrig">*</span> são obrigatórios</span></header>
+  <form class="corpo" method="post" action="{{ rota('visitas_nova') }}" novalidate
+        id="form-visita" data-valida="visita" data-agora="{{ agora_iso }}">
+    <div class="form-grid">
+      {% call campo("medico_id", "Médico", erros.medico_id) %}
+      <select id="medico_id" name="medico_id" required{% if erros.medico_id %} aria-invalid="true" aria-describedby="erro-medico_id"{% endif %}>
+        <option value="">Selecione um médico</option>
+        {% for id, nome in medicos %}<option value="{{ id }}"{% if v.medico_id == id %} selected{% endif %}>{{ nome }}</option>
+        {% endfor %}
+      </select>
+      {% endcall %}
+
+      {% call campo("data_hora", "Data e hora da visita", erros.data_hora, dica="Não pode ser uma data futura.") %}
+      <input type="datetime-local" id="data_hora" name="data_hora" value="{{ v.data_hora }}" max="{{ agora_input }}" required{% if erros.data_hora %} aria-invalid="true" aria-describedby="erro-data_hora"{% endif %}>
+      {% endcall %}
+
+      {% call campo("notas", "Notas", erros.notas, largo=true) %}
+      <textarea id="notas" name="notas" maxlength="1000" required placeholder="Resuma o que foi discutido (mín. 10 caracteres)"{% if erros.notas %} aria-invalid="true" aria-describedby="erro-notas"{% endif %}>{{ v.notas }}</textarea>
+      <div class="dica"><span>Não inclua e-mail nem telefone do médico ou de pacientes.</span><span class="contador" data-contador-de="notas">0/1000</span></div>
+      {% endcall %}
+    </div>
+    <div class="acoes-form">
+      <a class="btn grande" href="{{ rota('home') }}">Cancelar</a>
+      <button type="submit" class="btn brand grande" data-enviar>Salvar visita</button>
+    </div>
+  </form>
+</div>
+
+{{ dialogo_erros(erros, rotulos) }}
+
+{% if falha %}{{ dialogo_falha(falha) }}{% endif %}
+
+{% if sucesso %}
+{% call dialogo_sucesso("Visita registrada com sucesso") %}
+<div class="modal-corpo">
+  <p>A visita foi gravada e já conta no histórico.</p>
+  <dl class="resumo"><dt>Médico</dt><dd>{{ sucesso.medico }}</dd><dt>Data e hora</dt><dd>{{ sucesso.quando }}</dd></dl>
+</div>
+<div class="modal-rodape">
+  <button type="button" class="btn" data-fechar>Registrar outra</button>
+  <a class="btn brand" href="{{ rota('painel') }}">Ver painel</a>
+</div>
+{% endcall %}
+{% endif %}
+{% endblock %}

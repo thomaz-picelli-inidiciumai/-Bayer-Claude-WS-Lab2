@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block titulo %}Painel de médicos · BayViva{% endblock %}
+{% block conteudo %}
+<div class="page-header">
+  <span class="icone painel">P</span>
+  <div><div class="sub">Painel</div><h1>Médicos a visitar</h1></div>
+  <div class="acoes"><a class="btn brand" href="{{ rota('visitas_nova') }}">Registrar visita</a></div>
+</div>
+
+{% if erro %}
+<div class="card"><div class="corpo erro-painel" role="alert">
+  <p>{{ erro }}</p>
+  <a class="btn brand" href="{{ rota('painel') }}">Tentar novamente</a>
+</div></div>
+{% else %}
+
+<div class="cartoes-resumo">
+  <div class="cartao-resumo" data-resumo="total"><span class="valor">{{ resumo.total }}</span><div class="rotulo">Médicos na carteira</div></div>
+  <div class="cartao-resumo atencao" data-resumo="sem-visita"><span class="valor">{{ resumo.sem_visita }}</span><div class="rotulo">Sem nenhuma visita realizada</div></div>
+  <div class="cartao-resumo alerta" data-resumo="mais-90-dias"><span class="valor">{{ resumo.mais_90 }}</span><div class="rotulo">Sem visita há mais de 90 dias</div></div>
+</div>
+
+<div class="card">
+  <form class="filtros" method="get" action="{{ rota('painel') }}" role="search">
+    <div class="campo-form">
+      <label for="especialidade">Especialidade</label>
+      <select id="especialidade" name="especialidade">
+        <option value="">Todas</option>
+        {% for e in especialidades %}<option value="{{ e }}"{% if e == especialidade %} selected{% endif %}>{{ e }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="campo-form">
+      <label for="q">Nome</label>
+      <input type="search" id="q" name="q" value="{{ q }}" placeholder="Buscar por nome" autocomplete="off">
+    </div>
+    <div class="botoes">
+      <button type="submit" class="btn brand">Filtrar</button>
+      {% if rotulo_filtros %}<a class="btn" href="{{ rota('painel') }}">Limpar</a>{% endif %}
+    </div>
+  </form>
+
+  <table class="tabela-resp">
+    <thead><tr><th>Nome</th><th>Especialidade</th><th>Última visita</th><th>Há quanto tempo</th><th class="acoes"><span class="sr-only">Ações</span></th></tr></thead>
+    <tbody>
+    {% for m in medicos %}
+      <tr data-medico="{{ m.id }}">
+        <td data-rotulo="Nome"><a href="{{ rota('ficha', medico_id=m.id) }}">{{ m.nome }}</a></td>
+        <td data-rotulo="Especialidade">{{ m.especialidade }}</td>
+        <td data-rotulo="Última visita">{{ m.ultima }}</td>
+        <td data-rotulo="Há quanto tempo">{% if m.selo == "Sem visita" %}<span class="selo {{ m.classe }}">Sem visita</span>{% else %}<span class="selo {{ m.classe }}">{{ m.dias }}</span>{% endif %}</td>
+        <td class="acoes"><a class="btn pequeno" href="{{ rota('visitas_nova') }}?medico_id={{ m.id }}">Registrar visita</a></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="vazio">Nenhum médico encontrado para os filtros aplicados</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="rodape-tabela">
+    <span>{% if total %}Mostrando {{ de }}–{{ ate }} de {{ total }} médicos{% else %}0 médicos{% endif %}</span>
+    <nav class="paginacao" aria-label="Paginação">
+      {% if url_anterior %}<a class="btn" href="{{ url_anterior }}" rel="prev">Anterior</a>{% else %}<span class="btn desativado" aria-disabled="true">Anterior</span>{% endif %}
+      <span>Página {{ numero }} de {{ paginas }}</span>
+      {% if url_proxima %}<a class="btn" href="{{ url_proxima }}" rel="next">Próxima</a>{% else %}<span class="btn desativado" aria-disabled="true">Próxima</span>{% endif %}
+    </nav>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
