@@ -347,7 +347,7 @@ dialog.modal:not(:modal) { position: static; margin: 0 0 12px; width: 100%; box-
 .visita-item .linha { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 6px; }
 .visita-item.cancelada { border-left-color: var(--border-strong); background: var(--surface-alt); color: var(--text-muted); }
 .visita-item.cancelada .hora, .visita-item.cancelada .medico { text-decoration: line-through; }
-.visita-item .estado { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .03em; }
+.visita-item .estado { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .03em; }
 
 @media (max-width: 1100px) { .semana { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 900px) { .semana { grid-template-columns: 1fr; } .dia { min-height: 0; } }
@@ -369,8 +369,18 @@ dialog.modal:not(:modal) { position: static; margin: 0 0 12px; width: 100%; box-
   .global-header { gap: 8px; padding: 0 10px; }
   .global-header .busca { min-width: 0; }
   .usuario summary .nome-usuario { display: none; }
+  /* 16px nos campos evita o zoom automático do iOS ao focar */
+  .busca input, .campo-form input, .campo-form select, .campo-form textarea { font-size: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
   dialog.modal[open], .toast { animation: none; }
   .toast.saindo { transition: none; }
 }
+
+/* Ajustes de UX (ui-ux-pro-max): ver docs/specs/design-system.md, seção 9.
+   Ficam no fim do arquivo para vencer os estados :hover definidos acima. */
+a, button, summary, .btn { touch-action: manipulation; }
+td, .campo, .tile > div, .destaque > div, .visita-item, .card .corpo, .modal-corpo, .page-header h1 { min-width: 0; overflow-wrap: anywhere; }
+.btn:not(:disabled):not(.desativado):active,
+.btn.brand:not(:disabled):active,
+.btn.perigo:not(:disabled):active { background: var(--text); border-color: var(--text); color: var(--bg); }

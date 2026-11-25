@@ -59,6 +59,24 @@ Ajustes estruturais previstos: mover o `style=` inline de `ficha.html` para clas
 ## 7. Fora de escopo
 Banco, `db/seed.py`, rotas, regras de validação, textos de interface, novos componentes ou funcionalidades, fontes ou bibliotecas externas, logotipos de terceiros.
 
+## 9. Ajustes de UX (auditoria com `ui-ux-pro-max`)
+Auditoria do CSS contra as regras da skill, só camada visual, sem mudar markup, rotas ou textos. Cada regra foi confirmada por busca (`--domain ux`) ou pela tabela de prioridades da skill.
+
+| Regra (skill) | Lacuna encontrada | Ajuste |
+|---|---|---|
+| `readable-font-size` | Campos com 14px no celular (o iOS dá zoom automático abaixo de 16px) | `input`, `select`, `textarea` com 16px abaixo de 720px |
+| `long-token-wrapping` | Fonte monoespaçada alarga e-mails, nomes e IDs, com risco de estourar a largura | `overflow-wrap: anywhere` e filhos flex/grid encolhíveis em células, campos, atalhos e cartões |
+| `tap-delay` | Sem `touch-action` | `touch-action: manipulation` em botões, links e `summary` |
+| `press-feedback` / `state-clarity` | Botões sem estado pressionado | `.btn:active` com cores invertidas (fundo `--text`, texto `--bg`) |
+| Texto mínimo de 12px (tabela da skill) | `.visita-item .estado` com 11px | 12px |
+
+Critérios de aceite:
+1. Abaixo de 720px, `input`, `select` e `textarea` têm `font-size` de 16px.
+2. Nenhuma declaração `font-size` menor que 12px.
+3. `.btn:active`, `touch-action: manipulation` e `overflow-wrap: anywhere` presentes no CSS.
+4. Continuam valendo os critérios 1 a 8 acima e o `pytest` passa. Os contrastes do estado pressionado (`--bg` sobre `--text`) passam em AA.
+5. Os critérios 1 a 3 são verificados por teste automatizado em `tests/test_design_system.py`, que também protege a regra "nenhuma cor literal fora do `:root`".
+
 ## 8. Riscos conhecidos
 - Verde saturado sobre preto cansa em leitura longa: por isso texto de corpo em `#33ff66`/`#2ee05c` (não verde puro `#00ff00`), sem brilho em texto pequeno e fonte ≥ 13px.
 - Conteúdo gerado por `::before`/`::after` (prompt, colchetes, `> `, `[ OK ]`) pode ser lido por leitores de tela; é aceitável por ser curto, e a decisão é revisável.
