@@ -26,6 +26,8 @@ Os nomes atuais do BayViva (`--brand`, `--bg`, `--card`, `--border`, `--text`...
 | Movimento | `--dur-fast`, `--dur`, `--ease` (zere as durações em `prefers-reduced-motion`) |
 | Casca | `--header-bg`, `--nav-bg`, `--nav-accent-w` (espessura da linha ativa), `--logo-color` |
 | Nativo | `color-scheme: light` (ou `dark`) no `:root` |
+| Variantes usadas no CSS atual | `--bg-login`, `--hero-bg/-text/-border`, `--text-on-cat`, `--text-link-hover`, `--success-border`, `--danger-border`, `--danger-hover`, `--radius-md`, `--radius-chip`, `--radius-round`, `--radius-btn` (opcional), `--shadow-toast`, `--field-h`, `--dur-slow`, `--glow` (`none` se não usar) |
+| Casca decorativa (conteúdo por `::before/::after`, sempre atrás de token) | `--prompt-text`, `--title-prefix`, `--menu-open/-close/-ativo`, `--menu-case`, `--label-case` (`none` ou `uppercase`), `--marcador`, `--detalhe`, `--rotulo-ok/-erro/-aviso`, `--dur-logo` |
 
 Escala de espaçamento: use múltiplos de uma base (`--pad`) em vez de px soltos; densidade vira trocar um número.
 
@@ -47,7 +49,7 @@ Escala de espaçamento: use múltiplos de uma base (`--pad`) em vez de px soltos
 - **Documente o que cada token significa** em `docs/specs/design-system.md`; é o que permite a próxima pessoa (ou a próxima execução da skill) trocar o visual sem reler o CSS inteiro.
 
 ## 4. Checagem de contraste (rodar na verificação)
-Salve no scratchpad e rode com `python -I`, ajustando a lista `PARES` (nome, texto, fundo) com os valores finais dos tokens, para cada tema:
+Use o script pronto: `python -I .claude/skills/redesenhar-visual/contraste.py app/static/style.css` (veja [verificacao.md](verificacao.md)). Ele lê os tokens do `:root`, então não há valores para copiar. O trecho abaixo mostra só a matemática, caso precise de um cálculo avulso:
 
 ```python
 def lum(h):

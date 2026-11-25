@@ -10,6 +10,8 @@ Objetivo: o usuário descreve a aparência que quer, em qualquer direção, e o 
 Arquivos de apoio (leia sob demanda, não de uma vez):
 - [tokens.md](tokens.md): o contrato de tokens, as boas práticas e a checagem de contraste.
 - [estilos.md](estilos.md): receitas de direções visuais (Apple/iOS, terminal, marca corporativa, escuro, etc.) para propor opções na entrevista.
+- [verificacao.md](verificacao.md): contraste, guarda de testes, auditoria de UX, conferência visual sem imagens e dicas de ambiente.
+- [contraste.py](contraste.py): script que lê o `:root` do CSS e checa os pares texto/fundo em AA.
 
 ## Regras de ouro
 1. **Tokens primeiro, telas depois.** Toda decisão visual vive em variáveis CSS no `:root` de `app/static/style.css`. Trocar de visual = trocar tokens, mais poucos ajustes estruturais. Se uma tela exige valor fixo para ficar bonita, o token está faltando: crie-o.
@@ -18,6 +20,8 @@ Arquivos de apoio (leia sob demanda, não de uma vez):
 4. **Plano antes do código** (plan mode ou plano escrito e aprovado), **passos pequenos**, `pytest` a cada passo, commits pequenos.
 5. **Sem inventar marca.** Para identidade de uma marca real, peça ao usuário as cores (hex), a fonte e o arquivo do logo. Não reproduza logotipo de memória nem copie ativos protegidos; sem logo fornecido, use um símbolo genérico ou só o nome em texto. Sem dados reais: o repositório continua fictício.
 6. **Sem dependência externa em runtime.** Nada de CDN, Google Fonts ou bibliotecas de CSS (a VM pode estar sem internet e atrás de proxy). Use pilha de fontes do sistema ou arquivos locais em `app/static/fonts/`, referenciados com `{{ rota('static', path='...') }}` / caminho relativo ao CSS.
+7. **Skills e plugins de design externos são consulta, nunca decisão.** Se existir uma (ex.: de UX ou de design), use-a para propor opções ou auditar, e deixe a spec aprovada decidir; as sugestões dela costumam ignorar estas regras (CDN, dados fictícios, não mudar markup). **Não instale** plugin ou skill de terceiros sem o aval do usuário: roda código na máquina dele.
+8. **Sempre reversível.** Um commit por camada. Toda decoração da casca (prefixos, glifos, rótulos de estado, animação) fica atrás de token (`content: var(--x)`), de modo que um preset só de tokens reproduza o tema por inteiro; token ausente = regra sem efeito.
 
 ## Fase 0: Diagnóstico (sempre, antes de perguntar)
 Mapeie o que existe hoje, de verdade, sem confiar em lista antiga:
@@ -27,7 +31,8 @@ Mapeie o que existe hoje, de verdade, sem confiar em lista antiga:
    - `style=` inline e blocos `<style>` nos templates;
    - `font-family`, `font-size` em px soltos, `border-radius`, `box-shadow`, `transition`/`animation` literais;
    - SVGs com cor embutida (ex.: ícone da busca em data-URI, `_simbolo.html`).
-3. Resuma ao usuário em poucas linhas: quantas telas, qual a identidade atual (cor de marca, fonte, raio, densidade) e quanto está "preso" a valores fixos.
+3. Confira o ambiente (detalhes em [verificacao.md](verificacao.md), seção 5): Python do `.venv`, porta livre, e que o `pytest` passa **antes** de mexer (a linha de base).
+4. Resuma ao usuário em poucas linhas: quantas telas, qual a identidade atual (cor de marca, fonte, raio, densidade) e quanto está "preso" a valores fixos.
 
 ## Fase 1: Tokenizar (só se o diagnóstico achar valores fixos)
 Antes de qualquer troca de visual, deixe o CSS 100% dirigido por tokens, **sem mudar a aparência atual** (a tela deve ficar idêntica):
@@ -81,16 +86,19 @@ Peça aprovação da spec antes de seguir.
 3. **Tema escuro:** declare os tokens em `:root` (claro) e redefina em `@media (prefers-color-scheme: dark)` e em `:root[data-tema="escuro"]`, se o usuário quiser alternância manual. Defina `color-scheme` para os controles nativos e `<meta name="theme-color">` no `base.html`.
 4. **Logo/símbolo:** `_simbolo.html` deve usar `currentColor`. Se o usuário forneceu arquivo, salve em `app/static/` e referencie com `rota('static', ...)`.
 5. Commits pequenos e no imperativo, um por camada (tokens, componentes, cada grupo de telas).
+6. **Guarda de testes antes do CSS:** crie `tests/test_design_system.py` ([verificacao.md](verificacao.md), seção 2), veja-o falhar e só então aplique os tokens.
+7. **Auditoria de UX** ao fim dos componentes ([verificacao.md](verificacao.md), seção 3): 16px nos campos no celular, texto ≥ 12px, quebra de texto longo, `touch-action`, estado `:active`. O que exigir mudar markup vira sugestão, não entra.
 
 ## Fase 5: Verificação (não encerre sem isto)
 1. `pytest` passa, sem editar testes para "ficar verde". Se um teste dependia de texto/estrutura visual, explique e pergunte.
 2. Re-rode o diagnóstico da Fase 0: **zero** literais de cor fora do `:root`, zero `style=` inline.
-3. Contraste: rode a checagem de [tokens.md](tokens.md) para todos os pares texto/fundo (claro e escuro) e anexe o resultado. Corrija o que ficar abaixo de AA (4.5:1 texto, 3:1 componentes grandes/ícones/bordas de campo).
-4. Veja as telas de verdade: suba o app com `BAYVIVA_AGORA=2026-11-04T08:00 uvicorn app.main:app` (ou a variante do proxy do `CLAUDE.md`), abra cada tela do plano em largura de desktop (~1280px) e de celular (~390px), e confira: foco visível por teclado, pop-ups, toast, estado vazio, estado de erro, tabela virando cartões. Se houver navegador/automação disponível, tire capturas; senão, diga explicitamente que a conferência visual ficou para o usuário e liste o que olhar.
+3. Contraste: rode `python -I .claude/skills/redesenhar-visual/contraste.py app/static/style.css` ([verificacao.md](verificacao.md), seção 1), para cada tema, e anexe o resultado à spec. Corrija o que ficar abaixo de AA (4.5:1 texto, 3:1 ícones/bordas de campo/foco).
+4. Veja as telas: suba o app (porta livre, banco de teste, `BAYVIVA_AGORA=2026-11-04T08:00`; nunca encerre processo alheio) e siga a ordem de [verificacao.md](verificacao.md), seção 4: captura se houver navegador (perguntando antes de instalar um), senão o plano B sem imagens, listando para o usuário o que só o olho confere. Cada tela do plano deve responder 200 e usar só tokens. Diga qual caminho foi usado.
 5. Entregue um relatório curto: o que mudou (tokens e arquivos), o que foi verificado e como, o que ficou pendente. Atualize o `CLAUDE.md` (seção Estrutura) só se surgirem arquivos novos, como `docs/specs/design-system.md` ou `app/static/fonts/`.
 
 ## Reverter e alternar
-Mantenha o visual anterior recuperável: a troca fica em commits próprios na branch (por exemplo `feat/redesenho-visual`). Para alternar entre temas sem git, o usuário pode pedir "salve este visual como preset": copie o bloco de tokens para `app/static/temas/<nome>.css` (somente `:root{...}`) e carregue um deles por vez no `base.html`.
+Mantenha o visual anterior recuperável: a troca fica em commits próprios na branch (por exemplo `feat/redesenho-visual`). Para desfazer tudo, o caminho é o git, sem mexer à mão: `git checkout <commit-anterior> -- app/static/style.css app/templates/<arquivos tocados>` e remover os arquivos criados pelo redesenho (spec, guarda de testes, presets). Prefira um commit de reversão a reescrever o histórico.
+Para alternar entre temas sem git, o usuário pode pedir "salve este visual como preset": copie o bloco de tokens para `app/static/temas/<nome>.css` (somente `:root{...}`). Como a decoração da casca está atrás de tokens (regra de ouro 8), trocar o bloco troca o tema inteiro; regras estruturais que não dependam de token (ex.: toast com barra lateral) não viajam no preset, avise o usuário.
 
 ## O que não fazer
 - Não trocar o visual sem entrevista e sem spec aprovada, nem "melhorar" além do pedido (nada de novos componentes ou funcionalidades).
@@ -99,3 +107,5 @@ Mantenha o visual anterior recuperável: a troca fica em commits próprios na br
 - Não deixar cor, fonte, raio ou sombra literal fora do `:root`.
 - Não baixar o contraste abaixo de AA para "ficar fiel" a uma referência sem o usuário assumir o risco por escrito.
 - Não copiar logotipos ou ativos protegidos que o usuário não forneceu.
+- Não instalar plugin/skill de terceiros nem baixar binários sem aval; não contornar bloqueio de permissão ou de leitura de imagem (use o plano B e diga o que ficou para o usuário).
+- Não encerrar processo ou liberar porta que não foi você quem abriu.
