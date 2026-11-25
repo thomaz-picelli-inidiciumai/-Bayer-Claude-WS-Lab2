@@ -32,7 +32,7 @@ Siga esta ordem para qualquer tela nova:
 
 ## Ferramentas do projeto
 - **Servidor MCP `bayviva`** (somente leitura): `listar_tabelas`, `descrever_tabela`, `consultar` (um SELECT, até 500 linhas). Serve para inspecionar o banco real do app. Ele não grava: as gravações são feitas pelo app. Confira com `/mcp`.
-- **Skills:** `/checar-spec`, `/spec-para-testes`, `/verificar-gravacao`.
+- **Skills:** `/checar-spec`, `/spec-para-testes`, `/verificar-gravacao`, `/redesenhar-visual` (entrevista e troca o design system inteiro: cores, fontes, formas, tema, marca).
 
 ## Definição de pronto
 Uma tela só está pronta quando:
