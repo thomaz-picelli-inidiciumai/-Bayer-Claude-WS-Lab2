@@ -6,6 +6,7 @@ CRM simplificado para representantes da indústria farmacêutica. Tudo é fictí
 - Python 3.11+, FastAPI, templates Jinja2 (sem build de frontend), DuckDB local.
 
 ## Comandos
+- **Um comando só:** `bash iniciar.sh` (cria o `.venv`, instala, cria o banco, sobe o app atrás do proxy da VM e confere login, redirecionamento e CSS). Variantes: `bash iniciar.sh local` (sem proxy), `PORTA=8001 bash iniciar.sh` (outra porta, banco próprio), `bash iniciar.sh --so-verificar` (sobe, confere e encerra). Prefira-o aos comandos manuais abaixo; ele não mexe no `.mcp.json` nem em `mcp_server/`.
 - Instalar: `python -m venv .venv` e `.venv/bin/pip install -r requirements.txt` (Linux) ou `.venv/Scripts/pip ...` (Windows)
 - Criar o banco: `python db/seed.py` (gera `db/bayviva.duckdb`, semente fixa; rodar de novo zera os dados)
 - Rodar o app: `uvicorn app.main:app --reload` e abrir http://127.0.0.1:8000
@@ -19,6 +20,7 @@ CRM simplificado para representantes da indústria farmacêutica. Tudo é fictí
 - `docs/specs/` specs: `00-visao-geral.md`, `TEMPLATE.md`, `lab1-specs/`, `lab2-specs/`
 - `tests/` testes pytest (banco temporário por teste, via fixture `client`)
 - `mcp_server/` servidor MCP somente leitura do banco (ligado por `.mcp.json`)
+- `iniciar.sh` inicialização em um comando (fim de linha LF garantido por `.gitattributes`; precisa do bit de executável)
 - `.claude/skills/` skills do projeto
 
 ## Como trabalhar neste repositório

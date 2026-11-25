@@ -2,7 +2,22 @@
 
 Repositório inicial do workshop Claude Code. CRM fictício, dados 100% sintéticos.
 
-## Começar
+## Começar (um comando só)
+```bash
+bash iniciar.sh
+```
+Cria o ambiente Python, instala as dependências, cria o banco se faltar, escolhe prefixo e porta que combinam entre si, sobe o app e **confere** se o login, o redirecionamento e o CSS respondem no endereço certo. Por padrão roda no ambiente do workshop (atrás do proxy da VM): abra `https://<seu-host>/proxy/8000/login`.
+
+| Comando | Para que serve |
+|---|---|
+| `bash iniciar.sh` | ambiente do workshop (proxy da VM, `/proxy/8000`) |
+| `bash iniciar.sh local` | no seu computador, sem proxy (`http://127.0.0.1:8000/login`) |
+| `PORTA=8001 bash iniciar.sh` | outra porta, com banco próprio e prefixo `/proxy/8001` |
+| `bash iniciar.sh --so-verificar` | sobe, confere e encerra (útil para testar o ambiente) |
+
+Se a porta estiver em uso, o script avisa e sugere outra. Se a conferência falhar, ele mostra o final do log (`/tmp/bayviva-<porta>.log`). O script não mexe no `.mcp.json` nem em `mcp_server/`.
+
+## Começar (passo a passo, sem o script)
 ```bash
 python -m venv .venv
 .venv/Scripts/pip install -r requirements.txt   # Windows; Linux/Mac: .venv/bin/pip
